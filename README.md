@@ -33,3 +33,5 @@ sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz.c -lconfig -lcurl
 modules  		-> /etc/
 rc.local  		-> /etc/
 1wirevz 		-> /etc/init.d/
+
+.
