@@ -1,28 +1,28 @@
 /**************************************************************************
 
-  Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
+	Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 
-  Version 1.2
-  
-  sudo gcc -o /usr/sbin/1wirevz /home/pi/1wirevz/1wirevz.c -lconfig -lcurl 
-   
-  https://github.com/w3llschmidt/1wirevz.git
-  https://github.com/volkszaehler/volkszaehler.org.git
+	Version 0.2
 
-  Henrik Wellschmidt  <w3llschmidt@gmail.com>
+	sudo gcc -o /usr/sbin/1wirevz /home/pi/1wirevz/1wirevz.c -lconfig -lcurl 
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+	https://github.com/w3llschmidt/1wirevz.git
+	https://github.com/volkszaehler/volkszaehler.org.git
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+	Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************************/
 
@@ -36,9 +36,7 @@
 #include <string.h>
 #include <libconfig.h>
 #include <stddef.h>
-
 #include <sys/ioctl.h>
-
 #include <linux/i2c-dev.h>
 #include <curl/curl.h>
 
@@ -47,11 +45,8 @@
 void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
-
 int pidFilehandle, minterval, vzport;
-
 const char *vzserver, *vzpath;
-
 char sensorid[16];
 
 void signal_handler(int sig)
@@ -167,7 +162,7 @@ void daemonize(char *rundir, char *pidfile)
 	write(pidFilehandle, str, strlen(str));
 }
 
-int cfile()
+int cfile(void)
 {
 	config_t cfg;
 	config_setting_t *setting;
@@ -234,19 +229,15 @@ int cfile()
 
 int ds2482sysfs(void)
 {
-        FILE *f = fopen("/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves", "r");
-        fgets(sensorid, 16, f);            
-        fclose(f);
-        syslog(LOG_INFO, "1W devices found: %s\n", sensorid); 
+	FILE *f = fopen("/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves", "r");
+	fgets(sensorid, 16, f);            
+	fclose(f);
+	syslog(LOG_INFO, "1W devices found: %s\n", sensorid);
 }
 
 int ds1820read(void)
 {
-
-	// 2d 01 4b 46 7f ff 03 10 39 : crc=39 YES
-	// 2d 01 4b 46 7f ff 03 10 39 t=18812
-
-        char crc_buffer[40];
+	char crc_buffer[40];
 	char temp_buffer[40];
 	char crccheck[] = "YES";
 
@@ -254,34 +245,24 @@ int ds1820read(void)
 	char filename[sizeof format+16];
 
 	sprintf ( filename, format, sensorid );
-	
-	//syslog(LOG_INFO, "%s\n", filename);
 
-        FILE *fp = fopen ( filename, "r" );
+	FILE *fp = fopen ( filename, "r" );
 
-
-        	fgets( crc_buffer, sizeof(crc_buffer), fp );
-
-		if ( !strstr ( crc_buffer, crccheck ) )
-
-		{
+	fgets( crc_buffer, sizeof(crc_buffer), fp );
+	if ( !strstr ( crc_buffer, crccheck ) )
+	{
 		syslog(LOG_INFO, "%s | %s", filename, crc_buffer);
-		}
-
-		else
-
-		{
+	}
+	else
+	{
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
-                fgets( temp_buffer, sizeof(temp_buffer), fp );
+		fgets( temp_buffer, sizeof(temp_buffer), fp );
 		syslog(LOG_INFO, "%s | %s", filename, temp_buffer);
-		}
+	}
 
 	fclose ( fp );
 	return(EXIT_SUCCESS);
-
 }
-
-
 
 int main(void)
 {
@@ -296,8 +277,8 @@ int main(void)
 	// Hello world!
 	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon 1.0");
 
-        // Check and prosess the config file (/etc/1wirevz.cfg) */
-        cfile();
+	// Check and prosess the config file (/etc/1wirevz.cfg) */
+	cfile();
 
 	// DS2482 sysfs initalisieren; Sensor-IDs einlesen
 	ds2482sysfs();
@@ -312,3 +293,4 @@ int main(void)
 		ds1820read();	
 		sleep(60);
 	}
+}
