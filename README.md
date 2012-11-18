@@ -28,6 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Installation
 ============
 
+Precondition: Raspian Linux (http://www.raspberrypi.org/downloads)
+
 sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz.c -lconfig -lcurl
 
 1wirevz.cfg		-> /etc/ 
