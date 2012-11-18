@@ -41,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <curl/curl.h>
 
 #define DAEMON_NAME "1wirevz"
+#define DAEMON_VERSION "0.2"
 
 void daemonShutdown();
 void signal_handler(int sig);
@@ -266,7 +267,7 @@ int ds1820read(void)
 		{
 			fgets( temp_buffer, sizeof(temp_buffer), fp );
 			fgets( temp_buffer, sizeof(temp_buffer), fp );
-			syslog(LOG_INFO, "%s", temp_buffer);
+			//syslog(LOG_INFO, "%s", temp_buffer);
 		}
 
 	fclose ( fp );
@@ -289,10 +290,9 @@ int http_post(void)
 		curl = curl_easy_init();
 		if(curl) {
 
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME DAEMON_VERSION ); 
 		curl_easy_setopt(curl, CURLOPT_URL, url);
-
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
-
 
 		res = curl_easy_perform(curl);
 
