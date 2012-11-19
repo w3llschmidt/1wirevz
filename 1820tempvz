@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Einfaches (aber cooles!) DS2482 I²C 1-Wire® Master\
+# to Volkszaehler Bash-Script.
 # v1.0
 
 # modules -> /etc/
