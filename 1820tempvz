@@ -3,6 +3,8 @@
 # modules -> /etc/
 # rc.local -> /etc/
 
+# cronjob '* * * * *  /usr/local/bin/1820tempvz >/dev/null 2>&1'
+
 #
 # Für jeden Sensor (ID) einen eigenen Block!
 #################################################################################################
