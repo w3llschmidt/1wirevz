@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# modules -> /etc/
+# rc.local -> /etc/
+
+#
+# Für jeden Sensor (ID) einen eigenen Block!
 #################################################################################################
 
 # cat /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves
