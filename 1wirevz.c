@@ -53,7 +53,6 @@ const char *vzserver, *vzpath;
 
 char sensorid[16];
 
-
 void signal_handler(int sig)
 {
 	switch(sig)
@@ -175,7 +174,6 @@ int cfile(void)
 
 	int chdir(const char *path);
 
-	/* Read the config, check for errors, report it and exit. */
 	chdir ("/etc");
 
 	if(!config_read_file(&cfg, DAEMON_NAME".cfg"))
@@ -185,7 +183,6 @@ int cfile(void)
 		daemonShutdown();
 		exit(EXIT_FAILURE);
 	}
-
 
 	if (!config_lookup_string(&cfg, "vzserver", &vzserver))
 	{
@@ -227,41 +224,40 @@ int cfile(void)
 	}
 	else
 	syslog(LOG_INFO, "Metering interval:%d sec", minterval);
-
-	//config_destroy(&cfg);
-
 	return(EXIT_SUCCESS);
 }
 
 int ds2482_sysfs_init(void)
 {
 	FILE *f = fopen("/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves", "r");
-	fgets(sensorid, 16, f);            
+	fgets ( sensorid, 16, f );            
 	fclose(f);
+
 	syslog(LOG_INFO, "1W devices found: %s", sensorid);
+
+	return ( EXIT_FAILURE );	
 }
 
 int ds1820read(void)
 {
+
 	char crc_buffer[40];
 	char temp_buffer[40];
-	char crccheck[] = "YES";
+	char crc_ok[] = "YES";
 
 	char format[] = "/sys/bus/w1/devices/w1_bus_master1/%s/w1_slave";
 	char filename[sizeof format+16];
 
 	sprintf ( filename, format, sensorid );
-
 	//syslog(LOG_INFO, "%s", filename);
-
 	FILE *fp = fopen ( filename, "r" );
 
 		fgets( crc_buffer, sizeof(crc_buffer), fp );
 		
-		if ( !strstr ( crc_buffer, crccheck ) )
+		if ( !strstr ( crc_buffer, crc_ok ) )
 		{
 			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
-			return(-1);
+			return ( -1 );
 		}
 		else
 		{
@@ -271,16 +267,20 @@ int ds1820read(void)
 		}
 
 	fclose ( fp );
-	return(EXIT_SUCCESS);
+		
+	http_post(vz_uuid, temp);
+
+	return ( EXIT_SUCCESS );
+
 }
 
-int http_post(void)
+int http_post(vzuuid, temp)
 {
 
-        char format[] = "http://%s:%d/%s/data/52196840-2ef9-11e2-853d-fff0722808ce.json?value=18.234";
+        char format[] = "http://%s:%d/%s/data/%s.json?value=%d";
         char url[sizeof format+128];
 
-        sprintf ( url, format, vzserver, vzport, vzpath );
+        sprintf ( url, format, vzserver, vzport, vzpath, vzuuid, temp );
 
 		CURL *curl;
 		CURLcode res;
@@ -288,22 +288,32 @@ int http_post(void)
 		curl_global_init(CURL_GLOBAL_ALL);
 
 		curl = curl_easy_init();
-		if(curl) {
 
-		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME DAEMON_VERSION ); 
-		curl_easy_setopt(curl, CURLOPT_URL, url);
-		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
+		if(curl) 
+		{
+			FILE* devnull = NULL;
+			devnull = fopen("/dev/null", "w+");
 
-		res = curl_easy_perform(curl);
+			curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME DAEMON_VERSION ); 
+			curl_easy_setopt(curl, CURLOPT_URL, url);
+			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
 
-		if(res != CURLE_OK)
-		fprintf(stderr, "curl_easy_perform() failed: %s\n",
-		curl_easy_strerror(res));
+			curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
 
-		curl_easy_cleanup(curl);
+			res = curl_easy_perform(curl);
+
+				if(res != CURLE_OK)
+				syslog(LOG_INFO, "http_post() %s", curl_easy_strerror(res)); 
+
+			curl_easy_cleanup(curl);
+
+			fclose(devnull);
+
 		}
+
 		curl_global_cleanup();
-		return 0;
+
+		return ( EXIT_SUCCESS );
 
 }
 
@@ -334,7 +344,8 @@ int main(void)
 	while (1)
 	{
 		ds1820read();
-		http_post();
 		sleep(minterval);
 	}
+	
+	return 0;
 }
