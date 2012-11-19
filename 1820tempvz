@@ -15,15 +15,11 @@ s="28-0000042b410e"
 # Volkszaehler UUID
 u="52196840-2ef9-11e2-853d-fff0722808ce"
 
-cat /sys/bus/w1/devices/$s/w1_slave|\
-head -n1|\
-grep -i yes > /dev/null &&\
-t=$(cat /sys/bus/w1/devices/$s/w1_slave |\
-tail -n1 |\
-cut -f2 -d= |\
-awk '{print $1/1000}')
+output=$(cat /sys/bus/w1/devices/$s/w1_slave)
 
-curl --silent --data "" "http://localhost/middleware.php/data/$u.json?value=$t"
+echo "$output" | head -n1 | grep -i yes > /dev/null && t=$(echo "$output" | tail -n1 | cut -f2 -d= | awk '{print $1/1000}')
+
+#Komando nur ausfuehren, wenn $t gesetzt ist ($t wird nur gesetzt wenn in erste Zeile auf YES matched)
+test -z "$t" || curl --silent --data "" "http://localhost/middleware.php/data/$u.json?value=$t"
 
 #################################################################################################
-
