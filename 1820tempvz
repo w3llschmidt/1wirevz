@@ -21,7 +21,7 @@ output=$(cat /sys/bus/w1/devices/$s/w1_slave)
 
 echo "$output" | head -n1 | grep -i yes > /dev/null && t=$(echo "$output" | tail -n1 | cut -f2 -d= | awk '{print $1/1000}')
 
-#Komando nur ausfuehren, wenn $t gesetzt ist ($t wird nur gesetzt wenn in erste Zeile auf YES matched)
+#Komando nur ausfuehren, wenn $t gesetzt ist ($t wird nur gesetzt wenn 'crc=' YES matched)
 test -z "$t" || curl --silent --data "" "http://localhost/middleware.php/data/$u.json?value=$t"
 
 #################################################################################################
