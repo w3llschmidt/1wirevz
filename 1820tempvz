@@ -15,7 +15,7 @@ s="28-0000042b410e"
 # Volkszaehler UUID
 u="52196840-2ef9-11e2-853d-fff0722808ce"
 
-cat /sys/bus/w1/devices/28-*/w1_slave|\
+cat /sys/bus/w1/devices/$s/w1_slave|\
 head -n1|\
 grep -i yes > /dev/null &&\
 t=$(cat /sys/bus/w1/devices/28-*/w1_slave |\
