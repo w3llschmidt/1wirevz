@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Installation
 ============
 
-Precondition: Raspian Linux (http://www.raspberrypi.org/downloads)
+Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) + libcurl4-gnutls-dev + libconfig-dev
 
 Compile: sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz.c -lconfig -lcurl
 
