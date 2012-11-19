@@ -18,7 +18,7 @@ u="52196840-2ef9-11e2-853d-fff0722808ce"
 cat /sys/bus/w1/devices/$s/w1_slave|\
 head -n1|\
 grep -i yes > /dev/null &&\
-t=$(cat /sys/bus/w1/devices/28-*/w1_slave |\
+t=$(cat /sys/bus/w1/devices/$s/w1_slave |\
 tail -n1 |\
 cut -f2 -d= |\
 awk '{print $1/1000}')
