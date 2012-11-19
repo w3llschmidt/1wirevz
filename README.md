@@ -7,7 +7,7 @@ Version 0.2
 
 http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 
-<img>http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png</img>
+![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png)
 
 https://github.com/w3llschmidt/1wirevz.git
 https://github.com/volkszaehler/volkszaehler.org.git
