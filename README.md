@@ -1,18 +1,16 @@
 1wirevz - PROTOTYPE - dont use at this time!
 ============================================
 
-Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
-
+Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.  
 Version 0.2
 
+Hardware by Udo S.  
 http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 
-![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png)
+![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png?w=400)
 
-https://github.com/w3llschmidt/1wirevz.git
-https://github.com/volkszaehler/volkszaehler.org.git
-
-Henrik Wellschmidt  <w3llschmidt@gmail.com>
+https://github.com/w3llschmidt/1wirevz.git  
+https://github.com/volkszaehler/volkszaehler.org.git  
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,12 +32,13 @@ Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) + libcurl4-gn
 
 Compile: sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz.c -lconfig -lcurl
 
-1wirevz.cfg		-> /etc/
+1wirevz.cfg		-> /etc/  
 
-modules  		-> /etc/
+modules  		-> /etc/  
 
-rc.local  		-> /etc/
+rc.local  		-> /etc/  
 
-1wirevz 		-> /etc/init.d/
+1wirevz 		-> /etc/init.d/  
+
 
 
