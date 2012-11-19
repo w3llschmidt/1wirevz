@@ -5,7 +5,9 @@ Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 
 Version 0.2
 
-sudo gcc -o /usr/sbin/1wirevz /home/pi/1wirevz/1wirevz.c -lconfig -lcurl 
+http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
+
+http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png
 
 https://github.com/w3llschmidt/1wirevz.git
 https://github.com/volkszaehler/volkszaehler.org.git
