@@ -1,16 +1,17 @@
 1wirevz - PROTOTYPE - dont use at this time!
 ============================================
 
-Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
-
+DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.  
+  
 Version 0.2
 
-sudo gcc -o /usr/sbin/1wirevz /home/pi/1wirevz/1wirevz.c -lconfig -lcurl 
+Hardware by Udo S.  
+http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 
-https://github.com/w3llschmidt/1wirevz.git
-https://github.com/volkszaehler/volkszaehler.org.git
+![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png?w=300)
 
-Henrik Wellschmidt  <w3llschmidt@gmail.com>
+Backend-Software  
+https://github.com/volkszaehler/volkszaehler.org.git  
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,16 +29,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Installation
 ============
 
-Precondition: Raspian Linux (http://www.raspberrypi.org/downloads)
+Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) + libcurl4-gnutls-dev + libconfig-dev
 
-Compile: sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz.c -lconfig -lcurl
+1wirevz.c 	-> /tmp ( sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz.c -lconfig -lcurl )
 
-1wirevz.cfg		-> /etc/
+1wirevz.cfg 	-> /etc/  
 
-modules  		-> /etc/
+modules   	-> /etc/  
 
-rc.local  		-> /etc/
+rc.local  	-> /etc/  
 
-1wirevz 		-> /etc/init.d/
-
+1wirevz 	 	-> /etc/init.d/
 

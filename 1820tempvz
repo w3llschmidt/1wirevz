@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Einfaches (aber cooles!) DS2482 I²C 1-Wire® Master\
+# to Volkszaehler Bash-Script.
+# v1.0
+
+# modules -> /etc/
+# rc.local -> /etc/
+
+# cronjob '* * * * *  /usr/local/bin/1820tempvz >/dev/null 2>&1'
+
+#
+# Für jeden Sensor (ID) einen eigenen Block!
 #################################################################################################
 
 # cat /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves
@@ -8,15 +19,11 @@ s="28-0000042b410e"
 # Volkszaehler UUID
 u="52196840-2ef9-11e2-853d-fff0722808ce"
 
-cat /sys/bus/w1/devices/28-*/w1_slave|\
-head -n1|\
-grep -i yes > /dev/null &&\
-t=$(cat /sys/bus/w1/devices/28-*/w1_slave |\
-tail -n1 |\
-cut -f2 -d= |\
-awk '{print $1/1000}')
+output=$(cat /sys/bus/w1/devices/$s/w1_slave)
 
-curl --silent --data "" "http://localhost/middleware.php/data/$u.json?value=$t"
+echo "$output" | head -n1 | grep -i yes > /dev/null && t=$(echo "$output" | tail -n1 | cut -f2 -d= | awk '{print $1/1000}')
+
+#Komando nur ausfuehren, wenn $t gesetzt ist ($t wird nur gesetzt wenn 'crc=' YES matched)
+test -z "$t" || curl --silent --data "" "http://localhost/middleware.php/data/$u.json?value=$t"
 
 #################################################################################################
-
