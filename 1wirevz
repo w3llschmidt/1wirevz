@@ -4,8 +4,6 @@
 # 
 # Version 0.2
 # 
-# sudo gcc -o /usr/sbin/1wirevz /home/pi/1wirevz/1wirevz.c -lconfig -lcurl 
-# 
 # https://github.com/w3llschmidt/1wirevz.git
 # https://github.com/volkszaehler/volkszaehler.org.git
 # 

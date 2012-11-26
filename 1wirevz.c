@@ -307,7 +307,7 @@ int http_post(vzuuid, temp)
 
 			curl_easy_cleanup(curl);
 
-			fclose(devnull);
+			fclose ( devnull );
 
 		}
 
