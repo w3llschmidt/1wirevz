@@ -6,8 +6,7 @@ DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 Version 0.2
 
 Hardware by Udo S.  
-http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung  
-http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_4xs0_erweiterung  
+http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 
 ![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png?w=300)
 
