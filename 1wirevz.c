@@ -268,7 +268,7 @@ int ds1820read(void)
 
 	fclose ( fp );
 		
-	http_post(vz_uuid, temp);
+	http_post(vzuuid, temp);
 
 	return ( EXIT_SUCCESS );
 
