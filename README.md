@@ -41,3 +41,13 @@ rc.local  	-> /etc/
 
 1wirevz 	 	-> /etc/init.d/
 
+
+Configuration
+=============
+
+$ sudo insserv 1wirevz ( register new service )
+
+$ sudo vim /etc/1wirevz.cfg ( edit your config )
+
+$ /etc/init.d/1wirevz start ( start the service as user, dont be root! )
+
