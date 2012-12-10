@@ -1,9 +1,9 @@
 ### BEGIN INIT INFO
 # Provides: 1wirevz 
-# Required-Start: $remote_fs $syslog
-# Required-Stop: $remote_fs $syslog
-# Default-Start: 2 3 4 5
-# Default-Stop: 1
+# Required-Start:$ALL 
+# Required-Stop: 
+# Default-Start: 3
+# Default-Stop: 
 # Short-Description: DS2482 I²C 1-Wire® Master to Volkszaehler RaspberryPI deamon
 ### END INIT INFO
 
@@ -18,7 +18,7 @@ case "$1" in
 
    start)
 	test ! -f $PIDFILE || { echo "Deamon already running!"; exit 0; }
-        $DAEMON
+        su -c $DAEMON pi
         ;;
 
     stop)

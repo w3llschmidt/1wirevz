@@ -37,8 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <libconfig.h>
 #include <stddef.h>
 #include <sys/ioctl.h>
-#include <linux/i2c-dev.h>
 #include <curl/curl.h>
+#include <linux/i2c-dev.h>
 
 #define DAEMON_NAME "1wirevz"
 #define DAEMON_VERSION "0.2"
@@ -53,8 +53,7 @@ const char *vzserver, *vzpath;
 
 char sensorid[16];
 
-void signal_handler(int sig)
-{
+void signal_handler(int sig) {
 	switch(sig)
 	{
 		case SIGHUP:
@@ -72,14 +71,14 @@ void signal_handler(int sig)
 	}
 }
 
-void daemonShutdown()
-{
+
+void daemonShutdown() {
 		close(pidFilehandle);
 		remove("/tmp/1wirevz.pid");
 }
 
-void daemonize(char *rundir, char *pidfile)
-{
+
+void daemonize(char *rundir, char *pidfile) {
 	int pid, sid, i;
 	char str[10];
 	struct sigaction newSigAction;
@@ -166,8 +165,8 @@ void daemonize(char *rundir, char *pidfile)
 	write(pidFilehandle, str, strlen(str));
 }
 
-int cfile(void)
-{
+
+int cfile(void) {
 	config_t cfg;
 	config_setting_t *setting;
 	config_init(&cfg);
@@ -192,7 +191,7 @@ int cfile(void)
 		exit(EXIT_FAILURE);
 	}
 	else
-	syslog(LOG_INFO, "VzServer:%s", vzserver);
+	syslog(LOG_INFO, "VzServer: %s", vzserver);
 
 	if (!config_lookup_int(&cfg, "vzport", &vzport))
 	{
@@ -202,7 +201,7 @@ int cfile(void)
 		exit(EXIT_FAILURE);
 	}
 	else
-	syslog(LOG_INFO, "VzPort:%d", vzport);
+	syslog(LOG_INFO, "VzPort: %d", vzport);
 
 
 	if (!config_lookup_string(&cfg, "vzpath", &vzpath))
@@ -213,7 +212,7 @@ int cfile(void)
 		exit(EXIT_FAILURE);
 	}
 	else
-	syslog(LOG_INFO, "VzPath:%s", vzpath);
+	syslog(LOG_INFO, "VzPath: %s", vzpath);
 
 	if (!config_lookup_int(&cfg, "interval", &minterval))
 	{
@@ -223,39 +222,47 @@ int cfile(void)
 		exit(EXIT_FAILURE);
 	}
 	else
-	syslog(LOG_INFO, "Metering interval:%d sec", minterval);
-	return(EXIT_SUCCESS);
+	syslog(LOG_INFO, "Metering interval: %d sec", minterval);
+
+return(EXIT_SUCCESS);
 }
 
-int ds2482_sysfs_init(void)
-{
+
+int ds2482_sysfs_init(void) {
 	FILE *f = fopen("/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves", "r");
-	fgets ( sensorid, 16, f );            
+	fgets ( sensorid, sizeof(sensorid), f );
+
+	char line[3];  
+	int count=0;    
+
+	while ( fgets(line, 3, f) != NULL) count++;  
+	
 	fclose(f);
 
-	syslog(LOG_INFO, "1W devices found: %s", sensorid);
+	syslog(LOG_INFO, "Number of devices: %d", count); 
+	syslog(LOG_INFO, "Devices found: %s", sensorid);
 
-	return ( EXIT_FAILURE );	
+return ( EXIT_SUCCESS );	
 }
 
-int ds1820read(void)
-{
 
-	char crc_buffer[40];
-	char temp_buffer[40];
+int ds1820read(void) {
+
+	char crc_buffer[64];
+	char temp_buffer[64];
 	char crc_ok[] = "YES";
 
 	char format[] = "/sys/bus/w1/devices/w1_bus_master1/%s/w1_slave";
 	char filename[sizeof format+16];
 
 	sprintf ( filename, format, sensorid );
-	//syslog(LOG_INFO, "%s", filename);
 	FILE *fp = fopen ( filename, "r" );
 
 		fgets( crc_buffer, sizeof(crc_buffer), fp );
 		
-		if ( !strstr ( crc_buffer, crc_ok ) )
+		if ( !strstr ( crc_buffer, crc_ok ) ) 
 		{
+			syslog(LOG_INFO, "%s", crc_buffer);
 			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
 			return ( -1 );
 		}
@@ -263,19 +270,16 @@ int ds1820read(void)
 		{
 			fgets( temp_buffer, sizeof(temp_buffer), fp );
 			fgets( temp_buffer, sizeof(temp_buffer), fp );
-			//syslog(LOG_INFO, "%s", temp_buffer);
+			syslog(LOG_INFO, "%s", temp_buffer);
 		}
 
 	fclose ( fp );
-		
-	http_post(vzuuid, temp);
 
-	return ( EXIT_SUCCESS );
-
+return ( EXIT_SUCCESS );
 }
 
-int http_post(vzuuid, temp)
-{
+
+int http_post(vzuuid, temp) {
 
         char format[] = "http://%s:%d/%s/data/%s.json?value=%d";
         char url[sizeof format+128];
@@ -318,8 +322,7 @@ int http_post(vzuuid, temp)
 }
 
 
-int main(void)
-{
+int main(void) {
 	// Dont talk, just kiss!
 	fclose(stdout);
 	fclose(stderr);
