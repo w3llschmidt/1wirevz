@@ -2,8 +2,8 @@
 # Provides: 1wirevz 
 # Required-Start:$ALL 
 # Required-Stop: 
-# Default-Start: 3
-# Default-Stop: 
+# Default-Start: 2 3 4 5
+# Default-Stop: 1
 # Short-Description: DS2482 I²C 1-Wire® Master to Volkszaehler RaspberryPI deamon
 ### END INIT INFO
 
