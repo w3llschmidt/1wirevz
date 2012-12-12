@@ -47,11 +47,11 @@ void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
 
-int pidFilehandle, minterval, vzport;
+int pidFilehandle, minterval, vzport, i;
 
 const char *vzserver, *vzpath;
 
-char sensorid[16];
+char sensorid[64];
 
 void signal_handler(int sig) {
 	switch(sig)
@@ -229,20 +229,38 @@ return(EXIT_SUCCESS);
 
 
 int ds2482_sysfs_init(void) {
-	FILE *f = fopen("/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves", "r");
-	fgets ( sensorid, sizeof(sensorid), f );
 
-	char line[3];  
-	int count=0;    
-
-	while ( fgets(line, 3, f) != NULL) count++;  
+	// 3 x DS2482 (0x18, 0x19, 0x1a)
 	
-	fclose(f);
+	for (i=1; i<4; i++) {
+	
+	// /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves
+	// /sys/bus/w1/devices/w1_bus_master2/w1_master_slaves
+	// /sys/bus/w1/devices/w1_bus_master3/w1_master_slaves
+		
+		char *fn;
+		sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );	
+		FILE *fp = fopen( fn, "r");
 
-	syslog(LOG_INFO, "Number of devices: %d", count); 
-	syslog(LOG_INFO, "Devices found: %s", sensorid);
+		char nf[] = "not found";
+		
+				int count = 0;
+				while ( fgets ( sensorid, sizeof(sensorid), fp ) != 0 ) 
+				{
+				count++;
 
-return ( EXIT_SUCCESS );	
+					if ( !strstr ( sensorid, nf ) )
+					{
+					syslog( LOG_INFO, "(%d) %s", i, sensorid );
+					}
+				}
+		
+		fclose(fp);
+
+	}
+
+return ( EXIT_SUCCESS );
+
 }
 
 
