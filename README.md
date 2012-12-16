@@ -1,17 +1,16 @@
-1wirevz - PROTOTYPE - dont use at this time!
-============================================
-
-DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.  
-  
-Version 0.2
+DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'
+==============================================================
+1WIREVZ Version 0.2 (PROTOTYPE - dont use at this time!)
 
 Hardware by Udo S.  
 http://wiki.volkszaehler.org/hardware/controllers/raspberry_pi_erweiterung
 
-![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_s0_2.png?w=300)
+![My image](http://wiki.volkszaehler.org/_media/hardware/controllers/raspi_6xs0_3x1-wire_1xir_bestueckt.png?w=300)
 
-Backend-Software  
-https://github.com/volkszaehler/volkszaehler.org.git  
+Backend-Software
+https://github.com/volkszaehler/volkszaehler.org.git
+
+![My image](http://wiki.volkszaehler.org/_media/software/releases/demo-screenshot.jpg?w=300)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
