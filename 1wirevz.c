@@ -43,17 +43,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DAEMON_NAME "1wirevz"
 #define DAEMON_VERSION "0.2"
 
-#define ID_LENGTH 17
-
 void daemonShutdown();
 void signal_handler(int sig);
 void daemonize(char *rundir, char *pidfile);
 
-int pidFilehandle, minterval, vzport, i;
+int pidFilehandle, minterval, vzport, i, count;
 
 const char *vzserver, *vzpath;
 
-//char sensorid[3][64][ID_LENGTH];
+char sensorid[3][64][17];
+
 
 void signal_handler(int sig) {
 	switch(sig)
@@ -229,33 +228,23 @@ int cfile(void) {
 return(EXIT_SUCCESS);
 }
 
-
-int ds2482_sysfs_init(void) {
-
-	char sensorid[64][ID_LENGTH];	
-
-	// 3 x DS2482 (0x18, 0x19, 0x1a)
 	
-	for (i=1; i<4; i++) 
-	{
+int ds1820init(void) {
+
+	for (i=1; i<=3; i++) {
 	
-	// /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves
-	// /sys/bus/w1/devices/w1_bus_master2/w1_master_slaves
-	// /sys/bus/w1/devices/w1_bus_master3/w1_master_slaves
-		
-		char *fn;
+		char fn[64];
 		sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );	
-		FILE *fp = fopen( fn, "r");
-
-			int count = 0;
-
-			while ( fgets ( sensorid[i], ID_LENGTH, fp ) != 0 )
-			{
-			count++;
-			syslog( LOG_INFO, "%s (%d)", sensorid[i], i );
+		FILE *fp = fopen ( fn, "r" );
+	
+			count = 1;
+			while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != 0 ) {
+				sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
+				syslog( LOG_INFO, "%s (Bus: %d)", sensorid[i][count], i );
+				count++;
 			}
-
-	fclose(fp);
+			
+		fclose ( fp ) ;
 	}
 
 return ( EXIT_SUCCESS );
@@ -267,12 +256,11 @@ int ds1820read(sensorid) {
 	char crc_buffer[64];
 	char temp_buffer[64];
 	char crc_ok[] = "YES";
-
-	char format[] = "/sys/bus/w1/devices/w1_bus_master1/%s/w1_slave";
-	char filename[sizeof format+16];
-
-	sprintf ( filename, format, sensorid );
-	FILE *fp = fopen ( filename, "r" );
+	
+	char fn[64];
+	sprintf(fn, "/sys/bus/w1/devices/w1_bus_master1/%s/w1_slave", sensorid );
+	
+	FILE *fp = fopen ( fn, "r" );
 
 		fgets( crc_buffer, sizeof(crc_buffer), fp );
 		
@@ -286,11 +274,11 @@ int ds1820read(sensorid) {
 		{
 			fgets( temp_buffer, sizeof(temp_buffer), fp );
 			fgets( temp_buffer, sizeof(temp_buffer), fp );
-			syslog(LOG_INFO, "%s", temp_buffer);
+			syslog(LOG_INFO, "%s: %s", sensorid, temp_buffer);
 		}
 
 	fclose ( fp );
-
+	
 return ( EXIT_SUCCESS );
 }
 
@@ -348,13 +336,13 @@ int main(void) {
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
 
 	// Hello world!
-	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon 1.0");
+	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon %s", DAEMON_VERSION);
 
 	// Check and process the config file (/etc/1wirevz.cfg) */
 	cfile();
-
-	// DS2482 sysfs initalisieren; Sensor-IDs einlesen
-	ds2482_sysfs_init();
+	
+	// Sensoren einlesen
+	ds1820init();
 
 	// Deamonize
 	daemonize("/tmp/", "/tmp/1wirevz.pid");
@@ -362,9 +350,28 @@ int main(void) {
 	// Mainloop
 	while (1)
 	{
-		ds1820read();
-		sleep(minterval);
+	
+	/*
+			int i = 0;
+			for (i=1; i<=3; i++) {
+
+				char fn[64];
+				sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );	
+				FILE *fp = fopen ( fn, "r" );
+				
+					count = 1;
+					while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
+						sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
+						ds1820read(sensorid[i][count]);
+						count++;
+					}
+
+				fclose ( fp ) ;
+			}
+	*/
+			
+	sleep(minterval);
 	}
 	
-	return 0;
+return ( EXIT_SUCCESS );
 }
