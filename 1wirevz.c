@@ -51,7 +51,12 @@ int pidFilehandle, minterval, vzport, i, count;
 
 const char *vzserver, *vzpath;
 
-char sensorid[3][64][17];
+char sensorid[3][64][17], crc_buffer[64], temp_buffer[64], fn[64], url[128], vzuuid[32];
+
+char crc_ok[] = "YES";
+char not_found[] = "not found.";
+
+double temp;
 
 
 void signal_handler(int sig) {
@@ -167,7 +172,7 @@ void daemonize(char *rundir, char *pidfile) {
 }
 
 
-int cfile(void) {
+int cfile() {
 	config_t cfg;
 	config_setting_t *setting;
 	config_init(&cfg);
@@ -224,72 +229,77 @@ int cfile(void) {
 	}
 	else
 	syslog(LOG_INFO, "Metering interval: %d sec", minterval);
-
-return(EXIT_SUCCESS);
+	
+return ( EXIT_SUCCESS);
 }
 
-	
-int ds1820init(void) {
 
-	for (i=1; i<=3; i++) {
-	
-		char fn[64];
-		sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );	
-		FILE *fp = fopen ( fn, "r" );
-	
-			count = 1;
-			while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != 0 ) {
-				sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
-				syslog( LOG_INFO, "%s (Bus: %d)", sensorid[i][count], i );
-				count++;
+int ds1820init() {
+
+			int i = 0;
+			for (i=1; i<=3; i++) {
+
+				char fn[64];
+				sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );
+
+				FILE *fp;	
+				if  ( (fp = fopen ( fn, "r" )) == NULL ) {
+				syslog(LOG_INFO, "%s", strerror(errno));					
+				break;
+				}
+				else
+				{
+					count = 1;
+					while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
+						sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
+						syslog( LOG_INFO, "%s (Bus: %d)", sensorid[i][count], i );
+						count++;
+					}
+				}
+			fclose ( fp );
 			}
 			
-		fclose ( fp ) ;
-	}
-
-return ( EXIT_SUCCESS );
+return ( EXIT_SUCCESS);
 }
 
 
-int ds1820read(sensorid) {
+double ds1820read(char *sensorid) {
 
-	char crc_buffer[64];
-	char temp_buffer[64];
-	char crc_ok[] = "YES";
-	
-	char fn[64];
-	sprintf(fn, "/sys/bus/w1/devices/w1_bus_master1/%s/w1_slave", sensorid );
-	
-	FILE *fp = fopen ( fn, "r" );
+	sprintf(fn, "/sys/bus/w1/devices/%s/w1_slave", sensorid );
 
+	FILE *fp;	
+	if  ( (fp = fopen ( fn, "r" )) == NULL ) {
+	return(1);
+	}
+	else 
+	{
 		fgets( crc_buffer, sizeof(crc_buffer), fp );
-		
-		if ( !strstr ( crc_buffer, crc_ok ) ) 
-		{
+		if ( !strstr ( crc_buffer, crc_ok ) ) {
 			syslog(LOG_INFO, "%s", crc_buffer);
 			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
-			return ( -1 );
 		}
-		else
+		else 
 		{
-			fgets( temp_buffer, sizeof(temp_buffer), fp );
-			fgets( temp_buffer, sizeof(temp_buffer), fp );
-			syslog(LOG_INFO, "%s: %s", sensorid, temp_buffer);
+		fgets( temp_buffer, sizeof(temp_buffer), fp );
+		fgets( temp_buffer, sizeof(temp_buffer), fp );
+		
+			char *t;
+			t = strndup ( temp_buffer +29, 5 ) ;
+			temp = atof(t)/1000;
+			return(temp);
+			
 		}
-
-	fclose ( fp );
+	fclose ( fp );	
+	}
 	
-return ( EXIT_SUCCESS );
+return ( EXIT_SUCCESS);
 }
 
 
-int http_post(vzuuid, temp) {
+int http_post( double temp, char *vzuuid ) {
 
-        char format[] = "http://%s:%d/%s/data/%s.json?value=%d";
-        char url[sizeof format+128];
-
-        sprintf ( url, format, vzserver, vzport, vzpath, vzuuid, temp );
-
+		sprintf ( url, "http://%s:%d/%s/data/%s.json?value=%.2f", vzserver, vzport, vzpath, vzuuid, temp );
+				
 		CURL *curl;
 		CURLcode res;
 
@@ -320,13 +330,13 @@ int http_post(vzuuid, temp) {
 		}
 
 		curl_global_cleanup();
-
-		return ( EXIT_SUCCESS );
-
+		
+return ( EXIT_SUCCESS);
 }
 
 
-int main(void) {
+int main() {
+
 	// Dont talk, just kiss!
 	fclose(stdout);
 	fclose(stderr);
@@ -337,7 +347,7 @@ int main(void) {
 
 	// Hello world!
 	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon %s", DAEMON_VERSION);
-
+	
 	// Check and process the config file (/etc/1wirevz.cfg) */
 	cfile();
 	
@@ -346,32 +356,39 @@ int main(void) {
 
 	// Deamonize
 	daemonize("/tmp/", "/tmp/1wirevz.pid");
-
+						
 	// Mainloop
-	while (1)
-	{
 	
-	/*
-			int i = 0;
+	while(1) {
+	
+			i = 0;
 			for (i=1; i<=3; i++) {
-
-				char fn[64];
-				sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );	
-				FILE *fp = fopen ( fn, "r" );
+			
+				sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );
 				
+				FILE *fp;	
+				if  ( (fp = fopen ( fn, "r" )) == NULL ) 
+				{
+				syslog(LOG_INFO, "%s", strerror(errno));
+				}
+				else
+				{
 					count = 1;
 					while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
-						sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
+					sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
+					
+						if ( !( strstr ( sensorid[i][count], not_found ) )) {
 						ds1820read(sensorid[i][count]);
-						count++;
-					}
+						http_post(temp, vzuuid);
+						}
 
-				fclose ( fp ) ;
+					count++;
+					}
+				}
+			fclose ( fp );	
 			}
-	*/
-			
 	sleep(minterval);
 	}
 	
-return ( EXIT_SUCCESS );
+return ( EXIT_SUCCESS);
 }
