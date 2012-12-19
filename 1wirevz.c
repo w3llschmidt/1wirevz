@@ -236,28 +236,28 @@ return ( EXIT_SUCCESS);
 
 int ds1820init() {
 
-			int i = 0;
-			for (i=1; i<=3; i++) {
+	int i = 0;
+	for (i=1; i<=3; i++) {
 
-				char fn[64];
-				sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );
+		char fn[64];
+		sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );
 
-				FILE *fp;	
-				if  ( (fp = fopen ( fn, "r" )) == NULL ) {
-				syslog(LOG_INFO, "%s", strerror(errno));					
-				break;
-				}
-				else
-				{
-					count = 1;
-					while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
-						sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
-						syslog( LOG_INFO, "%s (Bus: %d)", sensorid[i][count], i );
-						count++;
-					}
-				}
-			fclose ( fp );
+		FILE *fp;	
+		if  ( (fp = fopen ( fn, "r" )) == NULL ) {
+		syslog(LOG_INFO, "%s", strerror(errno));					
+		break;
+		}
+		else
+		{
+			count = 1;
+			while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
+				sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
+				syslog( LOG_INFO, "%s (Bus: %d)", sensorid[i][count], i );
+				count++;
 			}
+		}
+	fclose ( fp );
+	}
 			
 return ( EXIT_SUCCESS);
 }
@@ -298,39 +298,37 @@ return ( EXIT_SUCCESS);
 
 int http_post( double temp, char *vzuuid ) {
 
-		sprintf ( url, "http://%s:%d/%s/data/%s.json?value=%.2f", vzserver, vzport, vzpath, vzuuid, temp );
-				
-		CURL *curl;
-		CURLcode res;
+	sprintf ( url, "http://%s:%d/%s/data/%s.json?value=%.2f", vzserver, vzport, vzpath, vzuuid, temp );
+			
+	CURL *curl;
+	CURLcode res;
 
-		curl_global_init(CURL_GLOBAL_ALL);
+	curl_global_init(CURL_GLOBAL_ALL);
 
-		curl = curl_easy_init();
+	curl = curl_easy_init();
 
-		if(curl) 
-		{
-			FILE* devnull = NULL;
-			devnull = fopen("/dev/null", "w+");
+	if(curl) 
+	{
+		FILE* devnull = NULL;
+		devnull = fopen("/dev/null", "w+");
 
-			curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME DAEMON_VERSION ); 
-			curl_easy_setopt(curl, CURLOPT_URL, url);
-			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME DAEMON_VERSION ); 
+		curl_easy_setopt(curl, CURLOPT_URL, url);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
 
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
 
-			res = curl_easy_perform(curl);
+		res = curl_easy_perform(curl);
 
-				if(res != CURLE_OK)
-				syslog(LOG_INFO, "http_post() %s", curl_easy_strerror(res)); 
+			if(res != CURLE_OK)
+			syslog(LOG_INFO, "http_post() %s", curl_easy_strerror(res)); 
 
-			curl_easy_cleanup(curl);
+		curl_easy_cleanup(curl);
 
-			fclose ( devnull );
-
-		}
-
-		curl_global_cleanup();
-		
+		fclose ( devnull );
+	}
+	curl_global_cleanup();
+	
 return ( EXIT_SUCCESS);
 }
 
