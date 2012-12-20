@@ -1,4 +1,6 @@
+--- insert after 'snd-bcm2835 --- remove this line ---
 
+# Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 i2c-bcm2708
 i2c-dev
 ds2482
