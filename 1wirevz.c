@@ -16,7 +16,6 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 #define DAEMON_NAME "1wirevz"
 #define DAEMON_VERSION "0.6"
 
-
 /**************************************************************************
 
 This program is free software: you can redistribute it and/or modify
