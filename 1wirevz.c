@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <linux/i2c-dev.h>
 
 #define DAEMON_NAME "1wirevz"
-#define DAEMON_VERSION "0.2"
+#define DAEMON_VERSION "0.5"
 
 void daemonShutdown();
 void signal_handler(int sig);
