@@ -2,7 +2,7 @@
 
 Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 
-Version 0.2
+Version 0.5
 
 sudo gcc -o /usr/sbin/1wirevz /home/pi/1wirevz/1wirevz.c -lconfig -lcurl 
 
@@ -49,14 +49,16 @@ void daemonize(char *rundir, char *pidfile);
 
 int pidFilehandle, minterval, vzport, i, count;
 
-const char *vzserver, *vzpath;
+const char *vzserver, *vzpath, *uuid;
 
-char sensorid[3][64][17], crc_buffer[64], temp_buffer[64], fn[64], url[128], vzuuid[32];
+char sensorid[3][64][17], vzuuid[3][64][128], crc_buffer[64], temp_buffer[64], fn[64], url[128];
 
 char crc_ok[] = "YES";
 char not_found[] = "not found.";
 
 double temp;
+
+config_t cfg;
 
 
 void signal_handler(int sig) {
@@ -77,12 +79,10 @@ void signal_handler(int sig) {
 	}
 }
 
-
 void daemonShutdown() {
 		close(pidFilehandle);
 		remove("/tmp/1wirevz.pid");
 }
-
 
 void daemonize(char *rundir, char *pidfile) {
 	int pid, sid, i;
@@ -171,9 +171,8 @@ void daemonize(char *rundir, char *pidfile) {
 	write(pidFilehandle, str, strlen(str));
 }
 
-
 int cfile() {
-	config_t cfg;
+
 	config_setting_t *setting;
 	config_init(&cfg);
 
@@ -233,7 +232,6 @@ int cfile() {
 return ( EXIT_SUCCESS);
 }
 
-
 int ds1820init() {
 
 	int i = 0;
@@ -245,23 +243,34 @@ int ds1820init() {
 		FILE *fp;	
 		if  ( (fp = fopen ( fn, "r" )) == NULL ) {
 		syslog(LOG_INFO, "%s", strerror(errno));					
-		break;
 		}
 		else
 		{
 			count = 1;
 			while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
-				sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
-				syslog( LOG_INFO, "%s (Bus: %d)", sensorid[i][count], i );
-				count++;
+			sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
+			
+						if ( !( strstr ( sensorid[i][count], not_found ) )) {
+						
+							char buffer[32];
+							sprintf ( buffer, "*%s", sensorid[i][count] );
+							config_lookup_string( &cfg, buffer, &uuid );
+							strcpy(vzuuid[i][count], uuid);
+						
+						}
+						
+			syslog( LOG_INFO, "%s (Bus: %d)", sensorid[i][count], i );
+			
+			count++;
 			}
+			
 		}
+		
 	fclose ( fp );
 	}
-			
+	
 return ( EXIT_SUCCESS);
 }
-
 
 double ds1820read(char *sensorid) {
 
@@ -294,7 +303,6 @@ double ds1820read(char *sensorid) {
 	
 return ( EXIT_SUCCESS);
 }
-
 
 int http_post( double temp, char *vzuuid ) {
 
@@ -331,7 +339,6 @@ int http_post( double temp, char *vzuuid ) {
 	
 return ( EXIT_SUCCESS);
 }
-
 
 int main() {
 
@@ -371,20 +378,25 @@ int main() {
 				}
 				else
 				{
+				
 					count = 1;
 					while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
 					sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
 					
 						if ( !( strstr ( sensorid[i][count], not_found ) )) {
 						ds1820read(sensorid[i][count]);
-						http_post(temp, vzuuid);
+		
+						http_post(temp, vzuuid[i][count]);
 						}
 
 					count++;
 					}
+					
 				}
+				
 			fclose ( fp );	
 			}
+			
 	sleep(minterval);
 	}
 	
