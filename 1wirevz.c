@@ -250,17 +250,17 @@ int ds1820init() {
 			while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
 			sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
 			
-						if ( !( strstr ( sensorid[i][count], not_found ) )) {
-						
-							char buffer[32];
-							sprintf ( buffer, "*%s", sensorid[i][count] );
-							if ( config_lookup_string( &cfg, buffer, &uuid ) == CONFIG_TRUE )
-							strcpy(vzuuid[i][count], uuid);
-						
-						}
+				if ( !( strstr ( sensorid[i][count], not_found ) )) {
+				
+					char buffer[32];
+					sprintf ( buffer, "*%s", sensorid[i][count] );
+					if ( config_lookup_string( &cfg, buffer, &uuid ) == CONFIG_TRUE )
+					strcpy(vzuuid[i][count], uuid);
+				
+				}
 						
 			syslog( LOG_INFO, "%s (Bus: %d) (VzUUID: %s)", sensorid[i][count], i, vzuuid[i][count] );
-			
+
 			count++;
 			}
 			
@@ -322,11 +322,7 @@ int http_post( double temp, char *vzuuid ) {
 		FILE* devnull = NULL;
 		devnull = fopen("/dev/null", "w+");
 
-<<<<<<< HEAD
 		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION ); 
-=======
-		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION );
->>>>>>> 894924dd525702635f8accbd4ad4f4bc8db997b1
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
 
