@@ -322,7 +322,11 @@ int http_post( double temp, char *vzuuid ) {
 		FILE* devnull = NULL;
 		devnull = fopen("/dev/null", "w+");
 
+<<<<<<< HEAD
 		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION ); 
+=======
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION );
+>>>>>>> 894924dd525702635f8accbd4ad4f4bc8db997b1
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
 
