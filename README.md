@@ -13,12 +13,23 @@ http://volkszaehler.org/
 
 ![My image](http://wiki.volkszaehler.org/_media/software/releases/demo-screenshot.jpg?w=300)
 
+
 Installation
 ============
 
-Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) + libcurl4-gnutls-dev + libconfig-dev
+Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) 
 
-firmware update!  -> https://github.com/Hexxeh/rpi-update
+---
+
+curl & libconfig	-> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
+
+The curl & libconfig is only needed if you compile the source! If you use the binary you dont need them!
+
+---
+
+firmware update!	-> https://github.com/Hexxeh/rpi-update
+
+---
 
 1wirevz.c 	-> /tmp ( sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz.c -lconfig -lcurl )
 
