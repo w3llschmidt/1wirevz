@@ -18,6 +18,8 @@ Installation
 
 Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) + libcurl4-gnutls-dev + libconfig-dev
 
+firmware update!  -> https://github.com/Hexxeh/rpi-update
+
 1wirevz.c 	-> /tmp ( sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz.c -lconfig -lcurl )
 
 1wirevz.cfg 	-> /etc/  
