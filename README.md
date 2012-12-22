@@ -22,9 +22,9 @@ Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) + libcurl4-gn
 
 1wirevz.cfg 	-> /etc/  
 
-modules   	-> /etc/  
+modules   	-> /etc/ ( ! add this settings, dont overwrite your exisiting modules ! )
 
-rc.local  	-> /etc/  
+rc.local  	-> /etc/ ( ! add this settings, dont overwrite your exisiting rc.local ! )  
 
 1wirevz 	 	-> /etc/init.d/
 
