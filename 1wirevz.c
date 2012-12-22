@@ -14,7 +14,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 **************************************************************************/
 
 #define DAEMON_NAME "1wirevz"
-#define DAEMON_VERSION "0.6"
+#define DAEMON_VERSION "1.0"
 
 /**************************************************************************
 
@@ -98,7 +98,6 @@ void daemonize(char *rundir, char *pidfile) {
 		return;
 	}
 
-	/* Signal mask - block */
 	sigemptyset(&newSigSet);
 	sigaddset(&newSigSet, SIGCHLD);
 	sigaddset(&newSigSet, SIGTSTP);
@@ -106,17 +105,14 @@ void daemonize(char *rundir, char *pidfile) {
 	sigaddset(&newSigSet, SIGTTIN);
 	sigprocmask(SIG_BLOCK, &newSigSet, NULL);
 
-	/* Signal handler */
 	newSigAction.sa_handler = signal_handler;
 	sigemptyset(&newSigAction.sa_mask);
 	newSigAction.sa_flags = 0;
 
-	/* Signals to handle */
 	sigaction(SIGHUP, &newSigAction, NULL);
 	sigaction(SIGTERM, &newSigAction, NULL);
 	sigaction(SIGINT, &newSigAction, NULL);
 
-	/* Fork*/
 	pid = fork();
 
 	if (pid < 0)
@@ -130,7 +126,7 @@ void daemonize(char *rundir, char *pidfile) {
 		exit(EXIT_SUCCESS);
 	}
 	
-	umask(027); /* file permissions 750 */
+	umask(027);
 
 	sid = setsid();
 	if (sid < 0)
@@ -143,14 +139,12 @@ void daemonize(char *rundir, char *pidfile) {
 		close(i);
 	}
 
-	/* Route I/O connections */
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
 
-	chdir(rundir); /* change running directory */
+	chdir(rundir);
 
-	/* Ensure only one copy */
 	pidFilehandle = open(pidfile, O_RDWR|O_CREAT, 0600);
 
 	if (pidFilehandle == -1 )
@@ -159,18 +153,14 @@ void daemonize(char *rundir, char *pidfile) {
 		exit(EXIT_FAILURE);
 	}
 
-	/* Try to lock file */
 	if (lockf(pidFilehandle,F_TLOCK,0) == -1)
 	{
-		/* Couldn't get lock on lock file */
 		syslog(LOG_INFO, "Could not lock PID lock file %s, exiting", pidfile);
 		exit(EXIT_FAILURE);
 	}
 
-	/* Get and format PID */
 	sprintf(str,"%d\n",getpid());
 
-	/* write pid to lockfile */
 	write(pidFilehandle, str, strlen(str));
 }
 
@@ -263,7 +253,7 @@ int ds1820init() {
 				
 				}
 						
-			syslog( LOG_INFO, "%s (Bus: %d) (VzUUID: %s)", sensorid[i][count], i, vzuuid[i][count] );
+			syslog( LOG_INFO, "%s (Bus: %d) (UUID: %s)", sensorid[i][count], i, vzuuid[i][count] );
 
 			count++;
 			}
