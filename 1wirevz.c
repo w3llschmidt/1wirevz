@@ -1,10 +1,8 @@
 /**************************************************************************
 
-Part of DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
+DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 
-Version 0.5
-
-sudo gcc -o /usr/sbin/1wirevz /home/pi/1wirevz/1wirevz.c -lconfig -lcurl 
+sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
 
 https://github.com/w3llschmidt/1wirevz.git
 https://github.com/volkszaehler/volkszaehler.org.git
@@ -338,28 +336,20 @@ return ( EXIT_SUCCESS);
 
 int main() {
 
-	// Dont talk, just kiss!
 	fclose(stdout);
 	fclose(stderr);
 
-	// Start Logging
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
 
-	// Hello world!
 	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon %s", DAEMON_VERSION);
 	
-	// Check and process the config file (/etc/1wirevz.cfg) */
 	cfile();
 	
-	// Sensoren einlesen
 	ds1820init();
 
-	// Deamonize
 	daemonize("/tmp/", "/tmp/1wirevz.pid");
-						
-	// Mainloop
-	
+				
 	while(1) {
 	
 			i = 0;
