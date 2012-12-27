@@ -322,9 +322,10 @@ int http_post( double temp, char *vzuuid ) {
 
 		res = curl_easy_perform(curl);
 
-			if(res != CURLE_OK)
-			syslog(LOG_INFO, "http_post() %s", curl_easy_strerror(res)); 
-
+			if(res != CURLE_OK) {
+			syslog(LOG_INFO, "http_post() %s", curl_easy_strerror(res));
+			}
+			
 		curl_easy_cleanup(curl);
 
 		fclose ( devnull );
