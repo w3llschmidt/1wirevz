@@ -31,15 +31,13 @@ firmware update!	-> https://github.com/Hexxeh/rpi-update
 
 ---
 
-1wirevz.c 	-> /tmp ( sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl )
+1wirevz.c 	-> sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
 
 1wirevz.cfg 	-> /etc/  
 
 modules   	-> /etc/ ( ! add this settings, dont overwrite your exisiting modules ! )
 
-rc.local  	-> /etc/ ( ! add this settings, dont overwrite your exisiting rc.local ! )  
-
-1wirevz 	 	-> /etc/init.d/
+1wirevz 	 	-> /etc/init.d/ (Start/Stop-Script!)
 
 
 Configuration
@@ -49,7 +47,7 @@ $ sudo insserv 1wirevz ( register new service )
 
 $ sudo vim /etc/1wirevz.cfg ( edit your config )
 
-$ /etc/init.d/1wirevz start ( start the service as user, dont be root! )
+$ sudo /etc/init.d/1wirevz start
 
 License
 =======
