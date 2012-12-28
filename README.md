@@ -43,7 +43,7 @@ modules   	-> /etc/ ( ! add this settings, dont overwrite your exisiting modules
 Configuration
 =============
 
-$ sudo insserv 1wirevz ( register new service )
+$ sudo ln -s /etc/init.d/1wirevz /etc/rc2.d/S991wirevz ( autostart )
 
 $ sudo vim /etc/1wirevz.cfg ( edit your config )
 
