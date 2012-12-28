@@ -162,7 +162,7 @@ void daemonize(char *rundir, char *pidfile) {
 	write(pidFilehandle, str, strlen(str));
 }
 
-int cfile() {
+void cfile() {
 
 	config_setting_t *setting;
 	config_init(&cfg);
@@ -219,11 +219,10 @@ int cfile() {
 	}
 	else
 	syslog(LOG_INFO, "Metering interval: %d sec", minterval);
-	
-return ( EXIT_SUCCESS);
+
 }
 
-int ds1820init() {
+void ds1820init() {
 
 	int i = 0;
 	for (i=1; i<=3; i++) {
@@ -261,7 +260,6 @@ int ds1820init() {
 	fclose ( fp );
 	}
 	
-return ( EXIT_SUCCESS);
 }
 
 double ds1820read(char *sensorid) {
@@ -295,10 +293,9 @@ double ds1820read(char *sensorid) {
 	fclose ( fp );	
 	}
 
-return ( EXIT_SUCCESS);
 }
 
-int http_post( double temp, char *vzuuid ) {
+void http_post( double temp, char *vzuuid ) {
 
 	sprintf ( url, "http://%s:%d/%s/data/%s.json?value=%.2f", vzserver, vzport, vzpath, vzuuid, temp );
 			
@@ -321,10 +318,6 @@ int http_post( double temp, char *vzuuid ) {
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
 
 		res = curl_easy_perform(curl);
-
-			//if(res != CURLE_OK) {
-			//syslog(LOG_INFO, "http_post() %s", curl_easy_strerror(res));
-			//}
 			
 		curl_easy_cleanup(curl);
 
@@ -332,10 +325,9 @@ int http_post( double temp, char *vzuuid ) {
 	}
 	curl_global_cleanup();
 	
-return ( EXIT_SUCCESS);
 }
 
-int main() {
+void main() {
 
 	fclose(stdout);
 	fclose(stderr);
@@ -386,6 +378,5 @@ int main() {
 			
 	sleep(minterval);
 	}
-	
-return ( EXIT_SUCCESS);
+
 }
