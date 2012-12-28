@@ -1,6 +1,6 @@
 ### BEGIN INIT INFO
 # Provides: 1wirevz 
-# Required-Start: $all
+# Required-Start: rc.local
 # Required-Stop: 
 # Default-Start: 2
 # Default-Stop: 6
