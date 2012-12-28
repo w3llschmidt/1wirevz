@@ -33,7 +33,9 @@ firmware update!	-> https://github.com/Hexxeh/rpi-update
 
 1wirevz.c 	-> sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
 
-1wirevz.cfg 	-> /etc/  
+1wirevz.cfg 	-> /etc/
+
+rc.local -> /etc/ ( ! add this settings, dont overwrite your exisiting rc.local ! )  
 
 modules   	-> /etc/ ( ! add this settings, dont overwrite your exisiting modules ! )
 
