@@ -4,6 +4,8 @@ DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 
 sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
 
+libcurl4-openssl-dev
+
 https://github.com/w3llschmidt/1wirevz.git
 https://github.com/volkszaehler/volkszaehler.org.git
 
@@ -53,7 +55,7 @@ int pidFilehandle, minterval, vzport, i, count;
 
 const char *vzserver, *vzpath, *uuid;
 
-char sensorid[3][64][17], vzuuid[3][64][128], crc_buffer[64], temp_buffer[64], fn[64], url[128];
+char sensorid[3][32][17], vzuuid[3][32][64], crc_buffer[64], temp_buffer[64], fn[128], url[128];
 
 char crc_ok[] = "YES";
 char not_found[] = "not found.";
@@ -124,7 +126,7 @@ void daemonize(char *rundir, char *pidfile) {
 		exit(EXIT_SUCCESS);
 	}
 	
-	umask(027);
+	//umask(027);
 
 	sid = setsid();
 	if (sid < 0)
@@ -164,7 +166,6 @@ void daemonize(char *rundir, char *pidfile) {
 
 void cfile() {
 
-	config_setting_t *setting;
 	config_init(&cfg);
 
 	int chdir(const char *path);
@@ -241,7 +242,7 @@ void ds1820init() {
 			while ( fgets ( sensorid[i][count], sizeof(sensorid[i][count]), fp ) != NULL ) {
 			sensorid[i][count][strlen(sensorid[i][count])-1] = '\0';
 			
-				if ( !( strstr ( sensorid[i][count], not_found ) )) {
+				if ( ! ( strstr ( sensorid[i][count], not_found ) )) {
 				
 					char buffer[32];
 					sprintf ( buffer, "*%s", sensorid[i][count] );
@@ -250,8 +251,10 @@ void ds1820init() {
 				
 				}
 						
+			if ( ! ( strstr ( sensorid[i][count], not_found ) )) {
 			syslog( LOG_INFO, "%s (Bus: %d) (UUID: %s)", sensorid[i][count], i, vzuuid[i][count] );
-
+			}
+			
 			count++;
 			}
 			
@@ -268,39 +271,39 @@ double ds1820read(char *sensorid) {
 
 	FILE *fp;	
 	if  ( (fp = fopen ( fn, "r" )) == NULL ) {
-	return(1);
+	return(temp);
 	}
 	else 
 	{
+	
 		fgets( crc_buffer, sizeof(crc_buffer), fp );
-		if ( !strstr ( crc_buffer, crc_ok ) ) {
+		if ( !strstr ( crc_buffer, crc_ok ) ) 
+		{
 			syslog(LOG_INFO, "%s", crc_buffer);
 			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
 		}
 		else 
 		{
-		
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
-		
 			char *t;
 			t = strndup ( temp_buffer +29, 5 ) ;
 			temp = atof(t)/1000;
 			return(temp);
-			
 		}
 		
 	fclose ( fp );	
 	}
-
+	
+return(temp);
 }
 
 void http_post( double temp, char *vzuuid ) {
 
-	sprintf ( url, "http://%s:%d/%s/data/%s.json?value=%.2f", vzserver, vzport, vzpath, vzuuid, temp );
-			
 	CURL *curl;
-	CURLcode res;
+	CURLcode curl_res;
+  
+	sprintf ( url, "http://%s:%d/%s/data/%s.json?value=%.2f", vzserver, vzport, vzpath, vzuuid, temp );
 
 	curl_global_init(CURL_GLOBAL_ALL);
 
@@ -314,20 +317,21 @@ void http_post( double temp, char *vzuuid ) {
 		curl_easy_setopt(curl, CURLOPT_USERAGENT, DAEMON_NAME " " DAEMON_VERSION ); 
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
-
+		
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
 
-		res = curl_easy_perform(curl);
-			
+		curl_res = curl_easy_perform(curl);
+			if(curl_res != CURLE_OK)
+			syslog ( LOG_INFO, "HTTP_POST(): %s", curl_easy_strerror(curl_res) );
+		
 		curl_easy_cleanup(curl);
-
 		fclose ( devnull );
 	}
-	curl_global_cleanup();
 	
+curl_global_cleanup();
 }
 
-void main() {
+int main() {
 
 	fclose(stdout);
 	fclose(stderr);
@@ -340,8 +344,10 @@ void main() {
 	cfile();
 	
 	ds1820init();
-
-	daemonize("/tmp/", "/tmp/1wirevz.pid");
+	
+	char pid_file[16];
+	sprintf ( pid_file, "/tmp/%s.pid", DAEMON_NAME );
+	daemonize( "/tmp/", pid_file );
 				
 	while(1) {
 	
@@ -351,7 +357,7 @@ void main() {
 				sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );
 				
 				FILE *fp;	
-				if  ( (fp = fopen ( fn, "r" )) == NULL ) 
+				if  ( (fp = fopen ( fn, "r" )) == NULL )
 				{
 				syslog(LOG_INFO, "%s", strerror(errno));
 				}
@@ -364,7 +370,6 @@ void main() {
 					
 						if ( !( strstr ( sensorid[i][count], not_found ) )) {
 						ds1820read(sensorid[i][count]);
-		
 						http_post(temp, vzuuid[i][count]);
 						}
 
@@ -378,5 +383,6 @@ void main() {
 			
 	sleep(minterval);
 	}
-
+	
+return(0);
 }
