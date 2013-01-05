@@ -19,7 +19,7 @@ Installation
 
 Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) 
 
-Binding librarys: curl & libconfig	-> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
+Binding libraries: curl & libconfig	-> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
 
 ---
 
