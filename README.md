@@ -19,33 +19,26 @@ Installation
 
 Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) 
 
----
-
-curl & libconfig	-> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
-
-The curl & libconfig is only needed if you compile the source! If you use the binary you dont need them!
+Binding librarys: curl & libconfig	-> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
 
 ---
 
-firmware update!	-> https://github.com/Hexxeh/rpi-update
+1wirevz.c     -> sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
 
----
+1wirevz.cfg   -> /etc/
 
-1wirevz.c 	-> sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
+rc.local      -> /etc/ ( ! add this settings, dont overwrite your exisiting rc.local ! )  
 
-1wirevz.cfg 	-> /etc/
+modules       -> /etc/ ( ! add this settings, dont overwrite your exisiting modules ! )
 
-rc.local -> /etc/ ( ! add this settings, dont overwrite your exisiting rc.local ! )  
-
-modules   	-> /etc/ ( ! add this settings, dont overwrite your exisiting modules ! )
-
-1wirevz 	 	-> /etc/init.d/ (Start/Stop-Script!)
-
+1wirevz       -> /etc/init.d/ (Start/Stop-Script!)
 
 Configuration
 =============
 
-$ sudo insserv 1wirevz ( make autostart )
+$ sudo vim /etc/init.d/rc.local ( replace '$ALL' with '$remote_fs $syslog $network' )
+
+$ sudo insserv 1wirevz ( autostart the deamon )
 
 $ sudo vim /etc/1wirevz.cfg ( edit your config )
 
