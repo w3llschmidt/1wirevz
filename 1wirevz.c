@@ -2,7 +2,7 @@
 
 DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 
-sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
+sudo gcc -Wall -Wextra -Werror -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
 
 libcurl4-openssl-dev
 
@@ -14,7 +14,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 **************************************************************************/
 
 #define DAEMON_NAME "1wirevz"
-#define DAEMON_VERSION "1.0"
+#define DAEMON_VERSION "1.1"
 
 /**************************************************************************
 
@@ -271,6 +271,7 @@ double ds1820read(char *sensorid) {
 
 	FILE *fp;	
 	if  ( (fp = fopen ( fn, "r" )) == NULL ) {
+	fclose ( fp );
 	return(temp);
 	}
 	else 
@@ -281,6 +282,8 @@ double ds1820read(char *sensorid) {
 		{
 			syslog(LOG_INFO, "%s", crc_buffer);
 			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
+			fclose ( fp );
+			return(temp);
 		}
 		else 
 		{
@@ -289,10 +292,10 @@ double ds1820read(char *sensorid) {
 			char *t;
 			t = strndup ( temp_buffer +29, 5 ) ;
 			temp = atof(t)/1000;
+			fclose ( fp );
 			return(temp);
 		}
-		
-	fclose ( fp );	
+
 	}
 	
 return(temp);
@@ -321,8 +324,10 @@ void http_post( double temp, char *vzuuid ) {
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
 
 		curl_res = curl_easy_perform(curl);
-			if(curl_res != CURLE_OK)
+		
+			if(curl_res != CURLE_OK) {
 			syslog ( LOG_INFO, "HTTP_POST(): %s", curl_easy_strerror(curl_res) );
+			}
 		
 		curl_easy_cleanup(curl);
 		fclose ( devnull );
