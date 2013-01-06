@@ -11,7 +11,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 #define DAEMON_NAME "1wirevz"
 #define DAEMON_VERSION "1.2"
-#define DAEMON_BUILD "0001"
+#define DAEMON_BUILD "0002"
 
 /**************************************************************************
 
@@ -342,14 +342,9 @@ curl_global_cleanup();
 
 int main() {
 
-<<<<<<< HEAD
     freopen( "/dev/null", "r", stdin);
     freopen( "/dev/null", "w", stdout);
     freopen( "/dev/null", "w", stderr);
-=======
-	//fclose(stdout);
-	//fclose(stderr);
->>>>>>> afdf923fb581895545b50d9cf3de94d94cce9327
 
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
