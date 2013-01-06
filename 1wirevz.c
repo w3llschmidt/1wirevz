@@ -338,8 +338,8 @@ curl_global_cleanup();
 
 int main() {
 
-	fclose(stdout);
-	fclose(stderr);
+	//fclose(stdout);
+	//fclose(stderr);
 
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
