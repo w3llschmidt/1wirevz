@@ -2,19 +2,16 @@
 
 DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 
-sudo gcc -Wall -Wextra -Werror -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
-
-libcurl4-openssl-dev
+sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
 
 https://github.com/w3llschmidt/1wirevz.git
-https://github.com/volkszaehler/volkszaehler.org.git
-
 Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 **************************************************************************/
 
 #define DAEMON_NAME "1wirevz"
-#define DAEMON_VERSION "1.1"
+#define DAEMON_VERSION "1.2"
+#define DAEMON_BUILD "0001"
 
 /**************************************************************************
 
@@ -252,7 +249,7 @@ void ds1820init() {
 				}
 						
 			if ( ! ( strstr ( sensorid[i][count], not_found ) )) {
-			syslog( LOG_INFO, "%s (Bus: %d) (UUID: %s)", sensorid[i][count], i, vzuuid[i][count] );
+			syslog( LOG_INFO, "%s (Bus: %d) (VzUUID: %s)", sensorid[i][count], i, vzuuid[i][count] );
 			}
 			
 			count++;
@@ -267,53 +264,61 @@ void ds1820init() {
 
 double ds1820read(char *sensorid) {
 
+	FILE *fp;	
+
 	sprintf(fn, "/sys/bus/w1/devices/%s/w1_slave", sensorid );
 
-	FILE *fp;	
 	if  ( (fp = fopen ( fn, "r" )) == NULL ) {
-	fclose ( fp );
 	return(temp);
 	}
+	
 	else 
+	
 	{
 	
 		fgets( crc_buffer, sizeof(crc_buffer), fp );
 		if ( !strstr ( crc_buffer, crc_ok ) ) 
 		{
-			syslog(LOG_INFO, "%s", crc_buffer);
+		
 			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
-			fclose ( fp );
-			return(temp);
+			
+		fclose ( fp );
+		return(temp);
 		}
+		
 		else 
+		
 		{
+		
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
+		
 			char *t;
 			t = strndup ( temp_buffer +29, 5 ) ;
 			temp = atof(t)/1000;
-			fclose ( fp );
-			return(temp);
+			
+		fclose ( fp );
+		return(temp);
 		}
 
 	}
 	
-return(temp);
 }
 
 void http_post( double temp, char *vzuuid ) {
 
 	CURL *curl;
 	CURLcode curl_res;
-  
+ 
 	sprintf ( url, "http://%s:%d/%s/data/%s.json?value=%.2f", vzserver, vzport, vzpath, vzuuid, temp );
 
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	curl = curl_easy_init();
 
-	if(curl) 
+	if(curl)
 	{
+
 		FILE* devnull = NULL;
 		devnull = fopen("/dev/null", "w+");
 
@@ -322,29 +327,29 @@ void http_post( double temp, char *vzuuid ) {
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
 		
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
-
-		curl_res = curl_easy_perform(curl);
-		
-			if(curl_res != CURLE_OK) {
-			syslog ( LOG_INFO, "HTTP_POST(): %s", curl_easy_strerror(curl_res) );
-			}
-		
+	
+		if( (curl_res = curl_easy_perform(curl)) != CURLE_OK) {
+		syslog ( LOG_INFO, "HTTP_POST(): %s", curl_easy_strerror(curl_res) );
+		}
+	
 		curl_easy_cleanup(curl);
 		fclose ( devnull );
+		
 	}
-	
+
 curl_global_cleanup();
 }
 
 int main() {
 
-	fclose(stdout);
-	fclose(stderr);
+    freopen( "/dev/null", "r", stdin);
+    freopen( "/dev/null", "w", stdout);
+    freopen( "/dev/null", "w", stderr);
 
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
 
-	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon %s", DAEMON_VERSION);
+	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon %s (%s)", DAEMON_VERSION, DAEMON_BUILD);
 	
 	cfile();
 	
