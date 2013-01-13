@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>              /* macros to report error conditions through error codes */
 #include <signal.h>             /* signal processing */
 #include <stddef.h>             /* defines the macros NULL and offsetof as well as the types ptrdiff_t, wchar_t, and size_t */
+
 #include <libconfig.h>          /* reading, manipulating, and writing structured configuration files */
 #include <curl/curl.h>          /* multiprotocol file transfer library */
 
