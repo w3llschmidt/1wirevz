@@ -11,7 +11,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 #define DAEMON_NAME "1wirevz"
 #define DAEMON_VERSION "1.2"
-#define DAEMON_BUILD "0002"
+#define DAEMON_BUILD "0003"
 
 /**************************************************************************
 
@@ -30,19 +30,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************************/
 
-#include <stdio.h>
-#include <signal.h>
-#include <syslog.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <libconfig.h>
-#include <stddef.h>
-#include <sys/ioctl.h>
-#include <curl/curl.h>
-#include <linux/i2c-dev.h>
+#include <stdio.h>              /* standard library functions for file input and output */
+#include <stdlib.h>             /* standard library for the C programming language, */
+#include <string.h>             /* functions implementing operations on strings  */
+#include <unistd.h>             /* provides access to the POSIX operating system API */
+#include <sys/stat.h>           /* declares the stat() functions; umask */
+#include <fcntl.h>              /* file descriptors */
+#include <syslog.h>             /* send messages to the system logger */
+#include <errno.h>              /* macros to report error conditions through error codes */
+#include <signal.h>             /* signal processing */
+#include <stddef.h>             /* defines the macros NULL and offsetof as well as the types ptrdiff_t, wchar_t, and size_t */
+#include <libconfig.h>          /* reading, manipulating, and writing structured configuration files */
+#include <curl/curl.h>          /* multiprotocol file transfer library */
 
 void daemonShutdown();
 void signal_handler(int sig);
