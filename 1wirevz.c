@@ -10,8 +10,8 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 **************************************************************************/
 
 #define DAEMON_NAME "1wirevz"
-#define DAEMON_VERSION "1.2"
-#define DAEMON_BUILD "0003"
+#define DAEMON_VERSION "1.3"
+#define DAEMON_BUILD "0001"
 
 /**************************************************************************
 
@@ -262,49 +262,6 @@ void ds1820init() {
 	
 }
 
-double ds1820read(char *sensorid) {
-
-	FILE *fp;	
-
-	sprintf(fn, "/sys/bus/w1/devices/%s/w1_slave", sensorid );
-
-	if  ( (fp = fopen ( fn, "r" )) == NULL ) {
-	return(temp);
-	}
-	
-	else 
-	
-	{
-	
-		fgets( crc_buffer, sizeof(crc_buffer), fp );
-		if ( !strstr ( crc_buffer, crc_ok ) ) 
-		{
-		
-			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
-			
-		fclose ( fp );
-		return(temp);
-		}
-		
-		else 
-		
-		{
-		
-		fgets( temp_buffer, sizeof(temp_buffer), fp );
-		fgets( temp_buffer, sizeof(temp_buffer), fp );
-		
-			char *t;
-			t = strndup ( temp_buffer +29, 5 ) ;
-			temp = atof(t)/1000;
-			
-		fclose ( fp );
-		return(temp);
-		}
-
-	}
-	
-}
-
 void http_post( double temp, char *vzuuid ) {
 
 	CURL *curl;
@@ -338,6 +295,50 @@ void http_post( double temp, char *vzuuid ) {
 	}
 
 curl_global_cleanup();
+}
+
+double ds1820read(char *sensorid) {
+
+	FILE *fp;	
+
+	sprintf(fn, "/sys/bus/w1/devices/%s/w1_slave", sensorid );
+
+	if  ( (fp = fopen ( fn, "r" )) == NULL ) {
+	return(-1);
+	}
+	
+	else 
+	
+	{
+	
+		fgets( crc_buffer, sizeof(crc_buffer), fp );
+		if ( !strstr ( crc_buffer, crc_ok ) ) 
+		{
+		
+			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
+			
+		fclose ( fp );
+		return(-1);
+		}
+		
+		else 
+		
+		{
+		
+		fgets( temp_buffer, sizeof(temp_buffer), fp );
+		fgets( temp_buffer, sizeof(temp_buffer), fp );
+		
+			char *t;
+			t = strndup ( temp_buffer +29, 5 ) ;
+			temp = atof(t)/1000;
+			
+		fclose ( fp );
+		http_post(temp, vzuuid[i][count]);
+
+		}
+
+	}
+	
 }
 
 int main() {
@@ -380,7 +381,7 @@ int main() {
 					
 						if ( !( strstr ( sensorid[i][count], not_found ) )) {
 						ds1820read(sensorid[i][count]);
-						http_post(temp, vzuuid[i][count]);
+						
 						}
 
 					count++;
