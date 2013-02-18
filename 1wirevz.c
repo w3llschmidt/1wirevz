@@ -11,7 +11,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 #define DAEMON_NAME "1wirevz"
 #define DAEMON_VERSION "1.3"
-#define DAEMON_BUILD "0001"
+#define DAEMON_BUILD "1"
 
 /**************************************************************************
 
