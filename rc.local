@@ -1,8 +1,6 @@
 ---------- insert bevor 'exit 0' ---------- remove this line ---
 
-
 # Part of DS2482 I2C 1-Wire Master to Volkszaehler 'RaspberryPI deamon'.
-
 echo ds2482 0x18 > /sys/bus/i2c/devices/i2c-1/new_device
 echo ds2482 0x19 > /sys/bus/i2c/devices/i2c-1/new_device
 echo ds2482 0x1a > /sys/bus/i2c/devices/i2c-1/new_device
