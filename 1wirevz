@@ -9,7 +9,7 @@
 
 #!/bin/bash
  
-DAEMON="/usr/sbin/1wirevz"
+DAEMON="/usr/local/bin/1wirevz"
 PIDFILE="/tmp/1wirevz.pid" 
 
 test -f $DAEMON || exit 0
