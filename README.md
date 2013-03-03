@@ -21,11 +21,11 @@ Precondition: Raspian Linux (http://www.raspberrypi.org/downloads)
 
 Binding libraries: libcurl & libconfig -> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
 
-Download: 'git clone https://github.com/w3llschmidt/1wirevz.git /tmp/1wirevz'
+Download: 'git clone https://github.com/w3llschmidt/1wirevz.git /usr/local/src/1wirevz'
 
 ---
 
-1wirevz.c     -> sudo gcc -o /usr/local/sbin/1wirevz /tmp/1wirevz/1wirevz.c -lconfig -lcurl
+1wirevz.c     -> 'sudo gcc -o /usr/local/sbin/1wirevz /usr/local/src/1wirevz/1wirevz.c -lconfig -lcurl'
 
 1wirevz.cfg   -> /etc/
 
