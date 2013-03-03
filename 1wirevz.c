@@ -2,9 +2,8 @@
 
 DS2482 I²C 1-Wire® Master to Volkszaehler 'RaspberryPI deamon'.
 
-sudo gcc -o /usr/sbin/1wirevz 1wirevz.c -lconfig -lcurl
-
 https://github.com/w3llschmidt/1wirevz.git
+
 Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 **************************************************************************/
