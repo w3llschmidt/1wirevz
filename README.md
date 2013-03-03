@@ -25,7 +25,7 @@ Download: 'git clone https://github.com/w3llschmidt/1wirevz.git /tmp/1wirevz'
 
 ---
 
-1wirevz.c     -> sudo gcc -o /usr/sbin/1wirevz /tmp/1wirevz/1wirevz.c -lconfig -lcurl
+1wirevz.c     -> sudo gcc -o /usr/local/bin/1wirevz /tmp/1wirevz/1wirevz.c -lconfig -lcurl
 
 1wirevz.cfg   -> /etc/
 
