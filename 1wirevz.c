@@ -256,7 +256,8 @@ void ds1820init() {
 			
 		}
 		
-	fclose ( fp );
+	if (fp != NULL)
+		fclose ( fp );
 	}
 	
 }
@@ -388,7 +389,8 @@ int main() {
 					
 				}
 				
-			fclose ( fp );	
+			if (fp != NULL)
+				fclose ( fp );	
 			}
 			
 	sleep(minterval);
