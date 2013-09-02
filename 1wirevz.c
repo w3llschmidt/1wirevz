@@ -233,12 +233,12 @@ int count_i2cdevices() {
 	}	
 
 
-	while ((entry = readdir(dirp)) != NULL) {
-		if (entry->d_type == DT_LNK) {
-		i2cdevices++;
-		}
+		while ((entry = readdir(dirp)) != NULL) {
+			if (entry->d_type == DT_LNK) {
+			i2cdevices++;
+			}
 
-	}
+		}
 
 	closedir(dirp);
 
