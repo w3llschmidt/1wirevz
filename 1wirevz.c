@@ -389,7 +389,7 @@ int main() {
 	while(1) {
 	
 			i = 0;
-			for (i=1; i<=3; i++) {
+			for (i=1; i<=count_i2cdevices(); i++) {
 			
 				sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );
 			
