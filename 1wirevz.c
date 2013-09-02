@@ -9,7 +9,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 **************************************************************************/
 
 #define DAEMON_NAME "1wirevz"
-#define DAEMON_VERSION "1.3"
+#define DAEMON_VERSION "1.5"
 #define DAEMON_BUILD "1"
 
 /**************************************************************************
@@ -39,6 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>              /* macros to report error conditions through error codes */
 #include <signal.h>             /* signal processing */
 #include <stddef.h>             /* defines the macros NULL and offsetof as well as the types ptrdiff_t, wchar_t, and size_t */
+#include <dirent.h>		/* constructs that facilitate directory traversing */
 
 #include <libconfig.h>          /* reading, manipulating, and writing structured configuration files */
 #include <curl/curl.h>          /* multiprotocol file transfer library */
@@ -78,7 +79,7 @@ void signal_handler(int sig) {
 	}
 }
 
-void daemonShutdown() {
+void  daemonShutdown() {
 		close(pidFilehandle);
 		remove("/tmp/1wirevz.pid");
 }
@@ -219,10 +220,35 @@ void cfile() {
 
 }
 
+int count_i2cdevices() {
+
+	int i2cdevices = 0;
+	DIR * dirp;
+	struct dirent * entry;
+
+	dirp = opendir("/sys/bus/i2c/devices/");
+	if (!dirp) {
+		syslog ( LOG_INFO, "Error: /sys/bus/i2c/devices not found! Check kernelmodul!" );
+		daemonShutdown();
+	}	
+
+
+	while ((entry = readdir(dirp)) != NULL) {
+		if (entry->d_type == DT_LNK) {
+		i2cdevices++;
+		}
+
+	}
+
+	closedir(dirp);
+
+return i2cdevices-2;
+}
+
 void ds1820init() {
 
 	int i = 0;
-	for (i=1; i<=3; i++) {
+	for (i=1; i<=count_i2cdevices(); i++) {
 
 		char fn[64];
 		sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );
@@ -261,8 +287,8 @@ void ds1820init() {
 	}
 	
 }
-
-void http_post( double temp, char *vzuuid ) {
+ 
+void http_post( double temp, char  *vzuuid ) {
 
 	CURL *curl;
 	CURLcode curl_res;
@@ -274,7 +300,7 @@ void http_post( double temp, char *vzuuid ) {
 	curl = curl_easy_init();
 
 	if(curl)
-	{
+	{ 
 
 		FILE* devnull = NULL;
 		devnull = fopen("/dev/null", "w+");
@@ -285,7 +311,7 @@ void http_post( double temp, char *vzuuid ) {
 		
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, devnull);
 	
-		if( (curl_res = curl_easy_perform(curl)) != CURLE_OK) {
+		if( (curl_res  = curl_easy_perform(curl)) != CURLE_OK) {
 		syslog ( LOG_INFO, "HTTP_POST(): %s", curl_easy_strerror(curl_res) );
 		}
 	
@@ -303,17 +329,17 @@ double ds1820read(char *sensorid) {
 
 	sprintf(fn, "/sys/bus/w1/devices/%s/w1_slave", sensorid );
 
-	if  ( (fp = fopen ( fn, "r" )) == NULL ) {
+	if  ( (fp = fopen ( fn, "r"  )) == NULL ) {
 	return(-1);
 	}
 	
 	else 
 	
-	{
+	{ 
 	
 		fgets( crc_buffer, sizeof(crc_buffer), fp );
 		if ( !strstr ( crc_buffer, crc_ok ) ) 
-		{
+	 	{
 		
 			syslog(LOG_INFO, "CRC check failed, SensorID: %s", sensorid);
 			
@@ -323,7 +349,7 @@ double ds1820read(char *sensorid) {
 		
 		else 
 		
-		{
+		{ 
 		
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
@@ -341,7 +367,7 @@ double ds1820read(char *sensorid) {
 	
 }
 
-int main() {
+int main() { 
 
     freopen( "/dev/null", "r", stdin);
     freopen( "/dev/null", "w", stdout);
@@ -350,8 +376,8 @@ int main() {
 	setlogmask(LOG_UPTO(LOG_INFO));
 	openlog(DAEMON_NAME, LOG_CONS | LOG_PERROR, LOG_USER);
 
-	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon %s (%s)", DAEMON_VERSION, DAEMON_BUILD);
-	
+	syslog(LOG_INFO, "DS2482 I²C 1-Wire® Master to Volkszaehler deamon %s (%s) %d", DAEMON_VERSION, DAEMON_BUILD, count_i2cdevices());
+
 	cfile();
 	
 	ds1820init();
@@ -366,7 +392,7 @@ int main() {
 			for (i=1; i<=3; i++) {
 			
 				sprintf ( fn, "/sys/bus/w1/devices/w1_bus_master%d/w1_master_slaves", i );
-				
+			
 				FILE *fp;	
 				if  ( (fp = fopen ( fn, "r" )) == NULL )
 				{
