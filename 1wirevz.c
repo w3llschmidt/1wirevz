@@ -10,7 +10,7 @@ Henrik Wellschmidt  <w3llschmidt@gmail.com>
 
 #define DAEMON_NAME "1wirevz"
 #define DAEMON_VERSION "1.5"
-#define DAEMON_BUILD "1"
+#define DAEMON_BUILD "2"
 
 /**************************************************************************
 
@@ -354,9 +354,21 @@ double ds1820read(char *sensorid) {
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
 		fgets( temp_buffer, sizeof(temp_buffer), fp );
 		
+			/**************************************************************************
 			char *t;
 			t = strndup ( temp_buffer +29, 5 ) ;
 			temp = atof(t)/1000;
+			**************************************************************************/
+			
+			char *pos = strstr(temp_buffer, "t=");
+
+			if (pos == NULL)
+				return -1;
+
+			pos += 2;
+			
+			temp = atof(pos)/1000;
+			
 			
 		fclose ( fp );
 		http_post(temp, vzuuid[i][count]);
