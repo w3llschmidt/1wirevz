@@ -1,3 +1,4 @@
+#!/bin/sh
 ### BEGIN INIT INFO
 # Provides: 1wirevz 
 # Required-Start: rc.local
