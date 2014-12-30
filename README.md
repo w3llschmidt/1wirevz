@@ -19,30 +19,30 @@ Installation
 
 Precondition: Raspian Linux (http://www.raspberrypi.org/downloads) 
 
-Binding libraries: libcurl & libconfig -> 'sudo apt-get install libcurl4-gnutls-dev libconfig-dev'
+Binding libraries: libcurl & libconfig (sudo apt-get install libcurl4-gnutls-dev libconfig-dev)
 
-Download: 'git clone https://github.com/w3llschmidt/1wirevz.git /usr/local/src/1wirevz'
+Download source ($ git clone https://github.com/w3llschmidt/1wirevz.git /usr/local/src/1wirevz)
 
 ---
 
-1wirevz.c     -> 'sudo gcc -o /usr/local/sbin/1wirevz /usr/local/src/1wirevz/1wirevz.c -lconfig -lcurl'
+compile 1wirevz.c ($ sudo gcc -o /usr/local/sbin/1wirevz /usr/local/src/1wirevz/1wirevz.c -lconfig -lcurl)
 
-1wirevz.cfg   -> /etc/
+copy 1wirevz.cfg > /etc/1wirevz.cfg (modify as needed)
 
-rc.local      -> /etc/ ( ! add this settings, dont overwrite your exisiting rc.local ! )  
+update your /etc/rc.local  (!add this settings, dont overwrite your exisiting rc.local!)  
 
-modules       -> /etc/ ( ! add this settings, dont overwrite your exisiting modules ! )
+update your /etc/modules  (!add this settings, dont overwrite your exisiting modules!)
 
-1wirevz       -> /etc/init.d/ (Start/Stop-Script!)
+copy 1wirevz > /etc/init.d/1wirevz (Start/Stop-Script!)
 
 Configuration
 =============
 
 $ sudo vim /etc/init.d/rc.local ( replace '$ALL' with '$remote_fs $syslog $network' )
 
-$ sudo insserv 1wirevz ( make deamon autostart )
+$ sudo insserv 1wirevz (make deamon autostartable)
 
-$ sudo vim /etc/1wirevz.cfg ( edit your config )
+$ sudo vim /etc/1wirevz.cfg (edit your config)
 
 Reboot and check '/var/log/syslog' for outputs!
 
