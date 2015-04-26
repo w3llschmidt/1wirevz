@@ -234,7 +234,7 @@ int count_i2cdevices() {
 
 
 		while ((entry = readdir(dirp)) != NULL) {
-			if (entry->d_type == DT_LNK) {
+			if (entry->d_type == DT_LNK && strstr(entry->d_name,"i2c")) {
 			i2cdevices++;
 			}
 
